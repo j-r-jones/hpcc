@@ -1,10 +1,10 @@
 /* 
  * -- High Performance Computing Linpack Benchmark (HPL)                
- *    HPL - 1.0a - January 20, 2004                          
+ *    HPL - 2.0 - September 10, 2008                          
  *    Antoine P. Petitet                                                
  *    University of Tennessee, Knoxville                                
- *    Innovative Computing Laboratories                                 
- *    (C) Copyright 2000-2004 All Rights Reserved                       
+ *    Innovative Computing Laboratory                                 
+ *    (C) Copyright 2000-2008 All Rights Reserved                       
  *                                                                      
  * -- Copyright notice and Licensing terms:                             
  *                                                                      
@@ -22,7 +22,7 @@
  * 3. All  advertising  materials  mentioning  features  or  use of this
  * software must display the following acknowledgement:                 
  * This  product  includes  software  developed  at  the  University  of
- * Tennessee, Knoxville, Innovative Computing Laboratories.             
+ * Tennessee, Knoxville, Innovative Computing Laboratory.             
  *                                                                      
  * 4. The name of the  University,  the name of the  Laboratory,  or the
  * names  of  its  contributors  may  not  be used to endorse or promote
@@ -47,6 +47,12 @@
 /*
  * Include files
  */
+#include <float.h>
+
+#ifndef DBL_DIGITS
+#define DBL_DIGITS 53
+#endif
+
 #include "hpl.h"
 /*
  * ---------------------------------------------------------------------
@@ -74,7 +80,7 @@ static double   HPL_dipow
 STDC_ARGS(
 (  const double,    const int ) );
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 double HPL_dlamch
 (
    const HPL_T_MACH                 CMACH
@@ -147,14 +153,29 @@ double HPL_dlamch
 /*
  * .. Local Variables ..
  */
-   static double              eps, sfmin, base, t, rnd, emin, rmin, emax,
+   /*static*/ double              eps, sfmin, base, t, rnd, emin, rmin, emax,
                               rmax, prec;
    double                     small;
-   static int                 first=1;
+   /*static*/ int                 first=0/*1*/;
    int                        beta=0, imax=0, imin=0, it=0, lrnd=0;
 /* ..
  * .. Executable Statements ..
  */
+   eps = DBL_EPSILON / FLT_RADIX;
+   base = FLT_RADIX;
+   prec = DBL_EPSILON;
+   t = DBL_DIGITS;
+   rnd = FLT_ROUNDS < 2 ? HPL_rone : HPL_rzero;
+   emin = DBL_MIN_EXP;
+   rmin = DBL_MIN;
+   emax = DBL_MAX_EXP;
+   rmax = DBL_MAX;
+
+   sfmin = rmin;
+   small = HPL_rone / rmax;
+   if (small >= sfmin)
+     sfmin = small * ( HPL_rone + eps );
+
    if( first != 0 )
    {
       first = 0;
@@ -190,7 +211,7 @@ double HPL_dlamch
  */
 }
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static void HPL_dlamc1
 (
    int                        * BETA,
@@ -325,7 +346,7 @@ static void HPL_dlamc1
    *BETA  = lbeta; *T = lt; *RND = lrnd; *IEEE1 = lieee1;
 } 
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static void HPL_dlamc2
 (
    int                        * BETA, 
@@ -573,7 +594,7 @@ static void HPL_dlamc2( BETA, T, RND, EPS, EMIN, RMIN, EMAX, RMAX )
    *EMIN = lemin; *RMIN = lrmin; *EMAX = lemax; *RMAX = lrmax;
 } 
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static double HPL_dlamc3( const double A, const double B )
 #else
 static double HPL_dlamc3( A, B )
@@ -611,7 +632,7 @@ static double HPL_dlamc3( A, B )
    return( A + B );
 } 
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static void HPL_dlamc4
 (
    int                        * EMIN,
@@ -680,7 +701,7 @@ static void HPL_dlamc4( EMIN, START, BASE )
    } while( ( c1 == a ) && ( c2 == a ) &&  ( d1 == a ) && ( d2 == a ) );
 } 
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static void HPL_dlamc5
 (
    const int                  BETA,
@@ -746,7 +767,7 @@ static void HPL_dlamc5( BETA, P, EMIN, IEEE, EMAX, RMAX )
  * .. Local Variables ..
  */
    double                     oldy=HPL_rzero, recbas, y, z;
-   int                        exbits=1, expsum, i, lexp=1, nbits, try,
+   int                        exbits=1, expsum, i, lexp=1, nbits, try_,
                               uexp;
 /* ..
  * .. Executable Statements ..
@@ -758,10 +779,10 @@ static void HPL_dlamc5( BETA, P, EMIN, IEEE, EMAX, RMAX )
  * required number RMAX).
  */
 l_10:
-   try = (int)( (unsigned int)(lexp) << 1 );
-   if( try <= ( -EMIN ) ) { lexp = try; exbits++; goto l_10; }
+   try_ = (int)( (unsigned int)(lexp) << 1 );
+   if( try_ <= ( -EMIN ) ) { lexp = try_; exbits++; goto l_10; }
 
-   if( lexp == -EMIN ) { uexp = lexp; } else { uexp = try; exbits++; }
+   if( lexp == -EMIN ) { uexp = lexp; } else { uexp = try_; exbits++; }
 /*
  * Now -lexp is less than or equal to EMIN, and -uexp is greater than or
  * equal to EMIN. exbits is the number of bits needed to store the expo-
@@ -828,7 +849,7 @@ l_10:
  */
 } 
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 static double HPL_dipow
 (
    const double               X,
