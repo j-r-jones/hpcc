@@ -1,10 +1,10 @@
 /* 
  * -- High Performance Computing Linpack Benchmark (HPL)                
- *    HPL - 1.0a - January 20, 2004                          
+ *    HPL - 2.0 - September 10, 2008                          
  *    Antoine P. Petitet                                                
  *    University of Tennessee, Knoxville                                
- *    Innovative Computing Laboratories                                 
- *    (C) Copyright 2000-2004 All Rights Reserved                       
+ *    Innovative Computing Laboratory                                 
+ *    (C) Copyright 2000-2008 All Rights Reserved                       
  *                                                                      
  * -- Copyright notice and Licensing terms:                             
  *                                                                      
@@ -22,7 +22,7 @@
  * 3. All  advertising  materials  mentioning  features  or  use of this
  * software must display the following acknowledgement:                 
  * This  product  includes  software  developed  at  the  University  of
- * Tennessee, Knoxville, Innovative Computing Laboratories.             
+ * Tennessee, Knoxville, Innovative Computing Laboratory.             
  *                                                                      
  * 4. The name of the  University,  the name of the  Laboratory,  or the
  * names  of  its  contributors  may  not  be used to endorse or promote
@@ -49,7 +49,7 @@
  */
 #include "hpl.h"
 
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
 void HPL_pwarn
 (
    FILE *                           STREAM,
@@ -101,7 +101,7 @@ va_dcl
    va_list                    argptr;
    int                        rank;
    char                       cline[128];
-#ifndef STDC_HEADERS
+#ifndef HPL_STDC_HEADERS
    FILE                       * STREAM;
    int                        LINE;
    char                       * FORM, * SRNAME;
@@ -109,7 +109,7 @@ va_dcl
 /* ..
  * .. Executable Statements ..
  */
-#ifdef STDC_HEADERS
+#ifdef HPL_STDC_HEADERS
    va_start( argptr, FORM );
 #else
    va_start( argptr );
@@ -129,6 +129,10 @@ va_dcl
       HPL_fprintf( STREAM, "%s %s %d, %s %s:\n>>> %s <<<\n\n",
                    "HPL ERROR", "from process #", rank, "in function",
                    SRNAME, cline );
+   else if( LINE >  (1 << 30) )
+      HPL_fprintf( STREAM, "%s %s %d, %s %d %s %s:\n>>> %s <<<\n\n",
+                   "HPL WARNING", "from process #", rank, "on line", LINE - (1 << 30),
+                   "of function", SRNAME, cline );
    else
       HPL_fprintf( STREAM, "%s %s %d, %s %d %s %s:\n>>> %s <<<\n\n",
                    "HPL ERROR", "from process #", rank, "on line", LINE,
