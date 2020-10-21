@@ -18,6 +18,9 @@ mpi.h
 #include <math.h>
 #include <time.h>
 
+#define HPCC_OUTFNAME_SIZE (MPI_MAX_PROCESSOR_NAME + 14)
+#define HPCC_INFNAME_SIZE 257
+
 #define MPIFFT_TIMING_COUNT 8
 
 /* Define 64-bit types and corresponding format strings for printf() and constants */
@@ -60,7 +63,7 @@ typedef struct {
    int ns, nbs, npqs, npfs, nbms, ndvs, nrfs, ntps, ndhs, tswap, L1notran, Unotran, equil, align;
 
   /* HPCC section */
-  char inFname[256 + 1], outFname[256 + 1];
+  char inFname[HPCC_INFNAME_SIZE], outFname[HPCC_OUTFNAME_SIZE];
   int PTRANSns, PTRANSnval[2 * HPL_MAX_PARAM];
   int PTRANSnbs, PTRANSnbval[2 * HPL_MAX_PARAM];
   int PTRANSnpqs, PTRANSpval[2 * HPL_MAX_PARAM], PTRANSqval[2 * HPL_MAX_PARAM];

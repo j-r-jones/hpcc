@@ -211,7 +211,7 @@ HPCC_Init(HPCC_Params *params) {
   int myRank, commSize;
   int i, nMax, nbMax, procCur, procMax, procMin, errCode;
   double totalMem;
-  char inFname[12] = "hpccinf.txt", outFname[13] = "hpccoutf.txt";
+  char inFname[12] = "hpccinf.txt", outFname[HPCC_OUTFNAME_SIZE] = { 0 };
   FILE *outputFile;
   MPI_Comm comm = MPI_COMM_WORLD;
   time_t currentTime;
@@ -226,9 +226,17 @@ HPCC_Init(HPCC_Params *params) {
   MPI_Comm_size( comm, &commSize );
   MPI_Comm_rank( comm, &myRank );
 
+  i = MPI_Get_processor_name( hostname, &hostnameLen );
+  if (i) hostname[0] = 0;
+  else hostname[Mmax(hostnameLen, MPI_MAX_PROCESSOR_NAME)] = 0;
+
+  i = snprintf( outFname, MPI_MAX_PROCESSOR_NAME + 14, "%s_hpccoutf.txt", hostname );
+  if (i) strncpy( outFname, "hpccoutf.txt", 13 );
+
   strcpy( params->inFname, inFname );
   strcpy( params->outFname, outFname );
 
+  /* Only the root process writes out to files. */
   if (0 == myRank)
     outputFile = fopen( params->outFname, "a" );
 
@@ -237,9 +245,6 @@ HPCC_Init(HPCC_Params *params) {
   if (ErrorReduce( outputFile, "No 64-bit integer type available.", errCode, comm ))
     return -1;
 
-  i = MPI_Get_processor_name( hostname, &hostnameLen );
-  if (i) hostname[0] = 0;
-  else hostname[Mmax(hostnameLen, MPI_MAX_PROCESSOR_NAME)] = 0;
   time( &currentTime );
 
   BEGIN_IO( myRank, params->outFname, outputFile );
