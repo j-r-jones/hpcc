@@ -18,7 +18,7 @@ Although benchmarks such as HPL (used for the [top500](https://www.top500.org/) 
 
 ## Coming soon ..
 
-This copy is being modified to report all of its results in CSV format, with the output file name chosen either by the user or based on the reported name of the rank0 node, as reported by `MPI_Get_processor_name()`.  The output will include all recorded benchmark results, rather than just the best result from each benchmark.
+This copy is being modified to report all of its results in CSV format, with the output file name chosen either by the user or based on the reported name of the rank0 node, as reported by `MPI_Get_processor_name()`.  The output will include all recorded benchmark results, rather than just the best result from each benchmark.  The default output file name has already been altered, so that if you are running multiple copies of HPCC from the same source directory, they will output to different files provided that rank 0 in each case receives a different value from `MPI_Get_processor_name()`.  The input file is not yet customisable or unique.
 
 It is assumed that the benchmark will be run multiple times with the same input, with each run of the benchmark appending to the CSV file if it already exists, or creating it if it does not.
 
