@@ -1,7 +1,7 @@
 /*
  This routine is called right after MPI_Init() and allows initialization
  of external software and hardware components. It can be replaced
- at the time of installation. A sample implemenation may initialize
+ at the time of installation. A sample implementation may initialize
  proprietary computational and communication libraries.
  The parameter "extdata" points to an object of size of a pointer.
  The function may choose to store a pointer to its internal data
