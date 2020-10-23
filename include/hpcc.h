@@ -117,7 +117,7 @@ This is what needs to be done to add a new benchmark:
 -  Print the output of the benchmark in HPCC_Finalize().
 -  For tests that have "Star" and "Single" variants (DGEMM, RandomAccess, STREAM) the function
 that performs the test returns a value (0 or 1) that indicates runtime failure and also returns
-benchamark failure (due to wrong optimization that causes numerical error) by setting
+benchmark failure (due to wrong optimization that causes numerical error) by setting
 params->Failure.
 */
 
